@@ -1,0 +1,89 @@
+{
+  "version": 3,
+  "enabled": true,
+  "schedule": {
+    "time": "09:00",
+    "timezone": "Asia/Shanghai",
+    "description": "每天早上 9 点推送"
+  },
+  "topics": [
+    {
+      "name": "OpenClaw 使用案例",
+      "keywords": [
+        "OpenClaw 用例",
+        "OpenClaw 实践",
+        "OpenClaw 应用场景",
+        "OpenClaw workflow",
+        "OpenClaw automation"
+      ],
+      "sources": [
+        "github",
+        "web"
+      ],
+      "preferredDomains": [
+        "github.com",
+        "developer.aliyun.com",
+        "alibabacloud.com",
+        "support.huaweicloud.com",
+        "larksuite.com",
+        "zhidx.com",
+        "36kr.com",
+        "blog.csdn.net",
+        "cnblogs.com",
+        "53ai.com",
+        "8world.com"
+      ],
+      "blockedDomains": [
+        "juliangoldie.com",
+        "oyelabs.com",
+        "chat-data.com"
+      ],
+      "enabled": true,
+      "priority": 1,
+      "profile": {
+        "entities": [
+          "OpenClaw",
+          "小龙虾"
+        ],
+        "preferredContentTypes": [
+          "source",
+          "use-case",
+          "workflow",
+          "integration"
+        ],
+        "preferredBusinessValues": [
+          "case-library",
+          "deployment-reference",
+          "risk-alert"
+        ],
+        "description": "关注 OpenClaw 真实实践、部署接入、风险信号与可沉淀案例"
+      }
+    }
+  ],
+  "output": {
+    "maxItems": 12,
+    "rawPerKeyword": 4,
+    "finalItems": 5,
+    "watchItems": 3,
+    "minSelectedScore": 5,
+    "minSelectedItems": 3,
+    "summaryLength": "short",
+    "includeSource": true,
+    "deduplication": true,
+    "similarityThreshold": 0.8
+  },
+  "delivery": {
+    "channel": "wecom",
+    "format": "markdown",
+    "includeEmoji": true
+  },
+  "filters": {
+    "minQuality": 3,
+    "excludeKeywords": [
+      "广告",
+      "推广"
+    ],
+    "dateRange": "24h",
+    "lookbackDays": 3
+  }
+}

@@ -84,7 +84,7 @@ config/topic-monitor-config.json
 并准备环境变量：
 
 ```bash
-export TAVILY_API_KEY='你的 Tavily API Key'
+export TAVILY_API_KEY='请在本地终端注入，不要写进仓库或截图'
 ```
 
 ### 3. 运行并查看结果
@@ -131,6 +131,13 @@ TODAY=$(TZ=Asia/Shanghai date +%Y-%m-%d)
 [ -s "./output/${TODAY}-主题监控日报.md" ] && echo "输出有内容 ✅" || echo "输出为空 ❌"
 grep -n "今日精选\|观察池\|今日判断" "./output/${TODAY}-主题监控日报.md"
 ```
+
+## 安全约束
+
+- `TAVILY_API_KEY` 只允许通过环境变量注入，不要写进仓库
+- 不要提交 `.env`、本地配置副本、运行日志或临时输出
+- 运行脚本时，API Key 不应直接拼进命令行参数展示
+- 公开仓库前，先再次检查：没有真实 key、没有私人监控主题、没有历史输出残留
 
 ## 边界
 

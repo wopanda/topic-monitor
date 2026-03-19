@@ -11,6 +11,8 @@ TZ_NAME="${TOPIC_MONITOR_TZ:-Asia/Shanghai}"
 TODAY=$(TZ="$TZ_NAME" date '+%Y-%m-%d')
 OUT_FILE="$OUTPUT_DIR/${TODAY}-主题监控日报.md"
 TMP_JSON="/tmp/topic-monitor-search-${TODAY}.json"
+TMP_PAYLOAD="/tmp/topic-monitor-payload-${TODAY}.json"
+trap 'rm -f "$TMP_JSON" "$TMP_PAYLOAD"' EXIT
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -59,9 +61,21 @@ if [ -z "${TAVILY_API_KEY:-}" ]; then
   exit 1
 fi
 
+KEYWORDS="$KEYWORDS" MAX_RESULTS="$MAX_RESULTS" python3 - <<'PY' > "$TMP_PAYLOAD"
+import json, os
+payload = {
+    "api_key": os.environ["TAVILY_API_KEY"],
+    "query": os.environ["KEYWORDS"],
+    "search_depth": "advanced",
+    "max_results": int(os.environ["MAX_RESULTS"]),
+    "time_range": "day",
+}
+print(json.dumps(payload, ensure_ascii=False))
+PY
+
 curl -sS -X POST "https://api.tavily.com/search" \
   -H "Content-Type: application/json" \
-  -d "{\"api_key\":\"$TAVILY_API_KEY\",\"query\":\"$KEYWORDS\",\"search_depth\":\"advanced\",\"max_results\":$MAX_RESULTS,\"time_range\":\"day\"}" \
+  --data @"$TMP_PAYLOAD" \
   > "$TMP_JSON"
 
 if ! jq -e '.results' "$TMP_JSON" >/dev/null 2>&1; then

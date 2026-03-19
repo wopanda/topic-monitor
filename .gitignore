@@ -4,3 +4,7 @@ config/topic-monitor-config.json
 *.local.json
 output/*
 !output/.gitkeep
+
+__pycache__/
+.tmp-verify/
+.tmp-package/

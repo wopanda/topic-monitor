@@ -1,6 +1,12 @@
 {
-  "version": 3,
+  "version": 4,
   "enabled": true,
+  "search": {
+    "provider": "auto",
+    "route": "auto",
+    "mode": "hybrid",
+    "description": "auto=有 TAVILY_API_KEY 时走 Tavily+China 融合；没有时自动退回 China 搜索"
+  },
   "schedule": {
     "time": "09:00",
     "timezone": "Asia/Shanghai",

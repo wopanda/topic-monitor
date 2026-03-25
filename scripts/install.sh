@@ -15,7 +15,11 @@ fi
 mkdir -p "$REPO_DIR/output"
 echo "已准备输出目录: $REPO_DIR/output"
 
+echo "建议安装 Python 依赖："
+echo "pip3 install -r requirements.txt"
+
 echo "下一步："
 echo "1) 编辑 config/topic-monitor-config.json"
-echo "2) export TAVILY_API_KEY='你的 Tavily API Key'"
-echo "3) TOPIC_MONITOR_OUTPUT_DIR=./output bash scripts/topic-monitor-run.sh"
+echo "2) 可选：export TAVILY_API_KEY='你的 Tavily API Key'"
+echo "3) pip3 install -r requirements.txt"
+echo "4) TOPIC_MONITOR_OUTPUT_DIR=./output bash scripts/topic-monitor-run.sh"

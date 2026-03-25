@@ -7,40 +7,30 @@ rm -rf "$TMP"
 mkdir -p "$TMP/output"
 
 [ -f "$ROOT/SKILL.md" ]
+[ -f "$ROOT/README.md" ]
+[ -f "$ROOT/requirements.txt" ]
+[ -f "$ROOT/scripts/search.py" ]
+[ -f "$ROOT/scripts/search_router.py" ]
+[ -f "$ROOT/scripts/topic-monitor-render.js" ]
 [ -f "$ROOT/config/topic-monitor-config.example.json" ]
 [ -f "$ROOT/examples/sample-report.md" ]
 
 bash "$ROOT/scripts/install.sh" >/dev/null
+python3 -m py_compile "$ROOT/scripts/search.py" "$ROOT/scripts/search_router.py"
+node --check "$ROOT/scripts/topic-monitor-render.js" >/dev/null
 
-python3 - <<'PY' "$TMP/topic-monitor-config.json"
-import json, sys
-cfg = {
-  "enabled": True,
-  "topics": [{
-    "enabled": True,
-    "name": "测试主题",
-    "keywords": ["OpenClaw", "AI工作流"],
-    "preferredDomains": ["github.com"],
-    "blockedDomains": []
-  }],
-  "output": {"maxItems": 10, "finalItems": 5, "watchItems": 3},
-  "filters": {"lookbackDays": 3, "excludeKeywords": []}
-}
-open(sys.argv[1], 'w', encoding='utf-8').write(json.dumps(cfg, ensure_ascii=False, indent=2))
-PY
-
+cp "$ROOT/config/topic-monitor-config.example.json" "$TMP/topic-monitor-config.json"
 TODAY=$(TZ=Asia/Shanghai date +%Y-%m-%d)
 OUT="$TMP/output/${TODAY}-主题监控日报.md"
 
-if [ -n "${TAVILY_API_KEY:-}" ]; then
-  TOPIC_MONITOR_CONFIG="$TMP/topic-monitor-config.json" TOPIC_MONITOR_OUTPUT_DIR="$TMP/output" bash "$ROOT/scripts/topic-monitor-run.sh" >/dev/null || true
-fi
+TOPIC_MONITOR_CONFIG="$TMP/topic-monitor-config.json" TOPIC_MONITOR_OUTPUT_DIR="$TMP/output" bash "$ROOT/scripts/topic-monitor-run.sh" >/dev/null || true
 
 if [ -s "$OUT" ]; then
   echo "✅ verify ok"
   echo "- report: $OUT"
+  grep -n "使用搜索源\|路由计划\|今日精选" "$OUT" || true
 else
-  echo "✅ verify ok"
-  echo "- structure only: required files and install script present"
-  echo "- note: full run requires TAVILY_API_KEY"
+  echo "✅ verify partial"
+  echo "- structure/scripts/config are ready"
+  echo "- full run may still depend on local Python deps: pip3 install -r requirements.txt"
 fi

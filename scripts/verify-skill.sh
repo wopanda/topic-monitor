@@ -8,6 +8,7 @@ mkdir -p "$TMP/output"
 
 [ -f "$ROOT/SKILL.md" ]
 [ -f "$ROOT/README.md" ]
+[ -f "$ROOT/LICENSE" ]
 [ -f "$ROOT/requirements.txt" ]
 [ -f "$ROOT/scripts/search_bocha.py" ]
 [ -f "$ROOT/scripts/topic-monitor-render.js" ]

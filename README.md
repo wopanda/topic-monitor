@@ -276,6 +276,12 @@ pip3 install -r requirements.txt
 
 ---
 
+## License
+
+本仓库采用 **MIT License**。
+
+---
+
 ## 安全提醒
 
 - `BOCHA_API_KEY` 只通过环境变量注入，不要写进仓库

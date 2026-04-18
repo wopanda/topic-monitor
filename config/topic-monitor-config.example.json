@@ -11,7 +11,8 @@
   "schedule": {
     "time": "09:00",
     "timezone": "Asia/Shanghai",
-    "description": "每天早上 9 点推送"
+    "enabled": false,
+    "description": "默认仅作为定时发布层的建议时间；首次跑通后，应先询问用户是否要开启定时发布"
   },
   "topics": [
     {
@@ -82,7 +83,9 @@
   "delivery": {
     "channel": "wecom",
     "format": "markdown",
-    "includeEmoji": true
+    "includeEmoji": true,
+    "mode": "external_scheduler",
+    "description": "推荐使用外层调度器 / workflow / agent 负责定时触发与消息发送"
   },
   "filters": {
     "minQuality": 3,

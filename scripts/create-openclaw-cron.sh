@@ -94,7 +94,7 @@ CRON_EXPR="${MINUTE} ${HOUR} * * *"
 JOB_NAME=${JOB_NAME:-"topic-monitor:${TOPIC_NAME}"}
 
 MESSAGE=$(cat <<EOF
-Run the topic-monitor skill from ${ROOT}. Use ${CONFIG_FILE} as the config, execute TOPIC_MONITOR_CRON_RUN=1 scripts/topic-monitor-run.sh to generate today's digest, and reply with only the final markdown report for delivery. Do not ask whether to set scheduled publishing during cron runs.
+Run the topic-monitor skill from ${ROOT}. Use ${CONFIG_FILE} as the config, execute `TOPIC_MONITOR_CRON_RUN=1 bash scripts/topic-monitor-run.sh` to generate today's digest, and reply with only the final markdown report for delivery. Do not ask whether to set scheduled publishing during cron runs.
 EOF
 )
 

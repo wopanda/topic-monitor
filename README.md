@@ -104,27 +104,27 @@ config/topic-monitor-config.json
 
 ---
 
-## 默认就是自动模式
+## 默认使用 Bocha
 
 读者默认只需要理解一件事：
 
 **直接运行就行。**
 
-系统内部会自动处理：
-- 有 `TAVILY_API_KEY` → 自动增强搜索效果
-- 没有 `TAVILY_API_KEY` → 自动退回保底搜索
+当前版本默认使用 **Bocha Search API**。
 
-也就是说：
-- 有 key，结果通常会更稳、更完整
-- 没有 key，也不会直接跑不起来
-
-### 如果你有 Tavily key（可选）
+运行前需要先设置：
 
 ```bash
-export TAVILY_API_KEY='你的 Tavily API Key'
+export BOCHA_API_KEY='你的 Bocha API Key'
 ```
 
-不提供也可以直接运行。
+### 如果你已经有 Bocha key
+
+```bash
+export BOCHA_API_KEY='你的 Bocha API Key'
+```
+
+不设置就无法运行。
 
 ---
 
@@ -212,7 +212,7 @@ pip3 install -r requirements.txt
 
 ## 安全提醒
 
-- `TAVILY_API_KEY` 只通过环境变量注入，不要写进仓库
+- `BOCHA_API_KEY` 只通过环境变量注入，不要写进仓库
 - 不要提交 `.env`、本地配置副本、运行日志或临时输出
 - 公开仓库前，先确认没有真实 key、私人主题或历史输出残留
 

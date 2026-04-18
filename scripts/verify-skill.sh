@@ -9,14 +9,13 @@ mkdir -p "$TMP/output"
 [ -f "$ROOT/SKILL.md" ]
 [ -f "$ROOT/README.md" ]
 [ -f "$ROOT/requirements.txt" ]
-[ -f "$ROOT/scripts/search.py" ]
-[ -f "$ROOT/scripts/search_router.py" ]
+[ -f "$ROOT/scripts/search_bocha.py" ]
 [ -f "$ROOT/scripts/topic-monitor-render.js" ]
 [ -f "$ROOT/config/topic-monitor-config.example.json" ]
 [ -f "$ROOT/examples/sample-report.md" ]
 
 bash "$ROOT/scripts/install.sh" >/dev/null
-python3 -m py_compile "$ROOT/scripts/search.py" "$ROOT/scripts/search_router.py"
+python3 -m py_compile "$ROOT/scripts/search_bocha.py"
 node --check "$ROOT/scripts/topic-monitor-render.js" >/dev/null
 
 cp "$ROOT/config/topic-monitor-config.example.json" "$TMP/topic-monitor-config.json"
@@ -28,7 +27,7 @@ TOPIC_MONITOR_CONFIG="$TMP/topic-monitor-config.json" TOPIC_MONITOR_OUTPUT_DIR="
 if [ -s "$OUT" ]; then
   echo "✅ verify ok"
   echo "- report: $OUT"
-  grep -n "使用搜索源\|路由计划\|今日精选" "$OUT" || true
+  grep -n "今天最值得看\|今天看到的变化\|还可以顺手看看" "$OUT" || true
 else
   echo "✅ verify partial"
   echo "- structure/scripts/config are ready"

@@ -2,10 +2,11 @@
   "version": 4,
   "enabled": true,
   "search": {
-    "provider": "auto",
-    "route": "auto",
-    "mode": "hybrid",
-    "description": "auto=有 TAVILY_API_KEY 时走 Tavily+China 融合；没有时自动退回 China 搜索"
+    "provider": "bocha",
+    "endpoint": "https://api.bochaai.com/v1/web-search",
+    "freshness": "oneYear",
+    "summary": true,
+    "description": "使用博查（Bocha）Search API 检索"
   },
   "schedule": {
     "time": "09:00",

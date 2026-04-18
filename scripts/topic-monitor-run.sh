@@ -38,9 +38,10 @@ EXCLUDE_JSON=$(jq -c '.filters.excludeKeywords // []' "$CONFIG_FILE")
 PREFERRED_DOMAINS_JSON=$(jq -c '.topics[0].preferredDomains // []' "$CONFIG_FILE")
 BLOCKED_DOMAINS_JSON=$(jq -c '.topics[0].blockedDomains // []' "$CONFIG_FILE")
 TOPIC_PROFILE_JSON=$(jq -c '.topics[0].profile // {}' "$CONFIG_FILE")
-SEARCH_PROVIDER=$(jq -r '.search.provider // "auto"' "$CONFIG_FILE")
-SEARCH_ROUTE=$(jq -r '.search.route // "auto"' "$CONFIG_FILE")
-SEARCH_MODE=$(jq -r '.search.mode // "hybrid"' "$CONFIG_FILE")
+SEARCH_PROVIDER=$(jq -r '.search.provider // "bocha"' "$CONFIG_FILE")
+SEARCH_FRESHNESS=$(jq -r '.search.freshness // "oneYear"' "$CONFIG_FILE")
+SEARCH_SUMMARY=$(jq -r '.search.summary // true' "$CONFIG_FILE")
+SEARCH_ENDPOINT=$(jq -r '.search.endpoint // "https://api.bochaai.com/v1/web-search"' "$CONFIG_FILE")
 TOTAL_RESULTS=$(( KEYWORD_COUNT * RAW_PER_KEYWORD ))
 if [ "$TOTAL_RESULTS" -lt "$MAX_ITEMS" ]; then
   MAX_RESULTS="$TOTAL_RESULTS"
@@ -65,64 +66,34 @@ fi
 
 echo "主题: $TOPIC_NAME"
 echo "关键词: $KEYWORDS"
-echo "搜索策略: provider=$SEARCH_PROVIDER route=$SEARCH_ROUTE mode=$SEARCH_MODE"
+echo "搜索策略: provider=$SEARCH_PROVIDER freshness=$SEARCH_FRESHNESS summary=$SEARCH_SUMMARY"
 
-run_auto_or_hybrid() {
-  python3 "$REPO_DIR/scripts/search_router.py" "$KEYWORDS" \
-    --route "$SEARCH_ROUTE" \
-    --mode "$SEARCH_MODE" \
-    --count "$MAX_RESULTS" \
-    > "$TMP_JSON"
-}
+if [ "$SEARCH_PROVIDER" != "bocha" ]; then
+  echo "当前版本仅支持 search.provider=bocha"
+  exit 1
+fi
 
-run_china_only() {
-  python3 "$REPO_DIR/scripts/search.py" "$KEYWORDS" \
-    --engine auto \
-    --mode parallel \
-    --count "$MAX_RESULTS" \
-    > "$TMP_JSON"
-}
+if [ -z "${BOCHA_API_KEY:-}" ]; then
+  echo "缺少 BOCHA_API_KEY"
+  exit 1
+fi
 
-run_tavily_only() {
-  if [ -z "${TAVILY_API_KEY:-}" ]; then
-    echo "provider=tavily 但当前缺少 TAVILY_API_KEY"
-    exit 1
-  fi
-  python3 "$REPO_DIR/scripts/search_router.py" "$KEYWORDS" \
-    --route global-first \
-    --mode fallback \
-    --count "$MAX_RESULTS" \
-    > "$TMP_JSON"
-}
-
-case "$SEARCH_PROVIDER" in
-  auto)
-    run_auto_or_hybrid
-    ;;
-  hybrid)
-    run_auto_or_hybrid
-    ;;
-  china)
-    run_china_only
-    ;;
-  tavily)
-    run_tavily_only
-    ;;
-  *)
-    echo "不支持的 search.provider: $SEARCH_PROVIDER"
-    exit 1
-    ;;
-esac
+python3 "$REPO_DIR/scripts/search_bocha.py" "$KEYWORDS" \
+  --count "$MAX_RESULTS" \
+  --freshness "$SEARCH_FRESHNESS" \
+  --summary "$SEARCH_SUMMARY" \
+  --endpoint "$SEARCH_ENDPOINT" \
+  > "$TMP_JSON"
 
 if ! jq -e 'type == "array" or (type == "object" and (.results? | type == "array"))' "$TMP_JSON" >/dev/null 2>&1; then
   echo "搜索结果格式异常"
   exit 1
 fi
 
-RAW_COUNT=$(jq -r 'if type == "array" then length else (.results | length) end' "$TMP_JSON")
-USED_PROVIDER=$(jq -r 'if type == "array" then "china" else (.used_provider // "unknown") end' "$TMP_JSON")
-RESOLVED_ROUTE=$(jq -r 'if type == "array" then "china-only" else ((.resolved_route // []) | join(" -> ")) end' "$TMP_JSON")
-ATTEMPTS_SUMMARY=$(jq -r 'if type == "array" then "china:ok" else ((.attempts // []) | map(if .ok then (.provider + ":ok:" + ((.result_count // 0)|tostring)) else (.provider + ":fail:" + (.reason // "unknown")) end) | join(" | ")) end' "$TMP_JSON")
+RAW_COUNT=$(jq -r '.results | length' "$TMP_JSON")
+USED_PROVIDER=$(jq -r '.used_provider // "unknown"' "$TMP_JSON")
+RESOLVED_ROUTE=$(jq -r '(.resolved_route // []) | join(" -> ")' "$TMP_JSON")
+ATTEMPTS_SUMMARY=$(jq -r '((.attempts // []) | map(if .ok then (.provider + ":ok:" + ((.result_count // 0)|tostring)) else (.provider + ":fail:" + (.reason // "unknown")) end) | join(" | "))' "$TMP_JSON")
 
 if [ "$RAW_COUNT" -eq 0 ]; then
   cat > "$OUT_FILE" <<EOF2
@@ -140,8 +111,8 @@ if [ "$RAW_COUNT" -eq 0 ]; then
 
 ### 建议
 - 检查关键词是否过窄
-- 如需全球结果，可补充 TAVILY_API_KEY
-- 如需国内结果优先，可将 search.provider 改为 china
+- 检查 BOCHA_API_KEY 是否正确
+- 检查 search.endpoint 与 freshness 配置
 
 ---
 *📅 生成时间: $(TZ="$TZ_NAME" date '+%Y-%m-%d %H:%M:%S') (${TZ_NAME})*

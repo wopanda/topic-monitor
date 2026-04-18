@@ -127,6 +127,8 @@ function looksLikeLowValuePage(item) {
   if (txt.includes('openclaw home page') && txt.includes('navigation') && txt.includes('releases')) return true;
   if (txt.includes('免费poc') && txt.includes('首页 产品服务')) return true;
   if (txt.includes('navigation 概览') && txt.includes('搜索')) return true;
+  if (txt.includes('ai 智能聊天') && txt.includes('问答助手') && txt.includes('免费无限量使用')) return true;
+  if (txt.includes('☞☞☞') || txt.includes('☜☜☜')) return true;
   return false;
 }
 
@@ -325,16 +327,20 @@ function scoreItem(item, historyMap) {
   if (preferredContentTypes.includes(item.contentType)) score += 1;
   if (preferredBusinessValues.includes(item.businessValue)) score += 1;
 
-  if (h.includes('github.com')) score += 3;
-  else if (/(aliyun|alibabacloud|huaweicloud|larksuite)/.test(h)) score += 2;
-  else if (/(blog|csdn|53ai|zhidx|36kr|8world|cnblogs)/.test(h)) score += 1;
+  if (/(github\.com|docs\.openclaw\.ai|openclaw\.ai)/.test(h)) score += 4;
+  else if (/(aliyun|alibabacloud|huaweicloud|larksuite|tencentcloud)/.test(h)) score += 2;
+  else if (/(zhidx|36kr)/.test(h)) score += 1;
+
+  if (/(csdn|cnblogs|toutiao|baijiahao|sohu\.com|news\.qq\.com|163\.com)/.test(h)) score -= 2;
 
   if (txt.includes('最佳实践') || txt.includes('best practice')) score += 2;
   if (txt.includes('部署') || txt.includes('安装')) score += 1;
   if (txt.includes('教程')) score -= 1;
   if (txt.includes('转载')) score -= 1;
+  if (/你能想到|爆火|最全|保姆级|一文读懂|手把手/.test(item.title || '')) score -= 1;
   if (txt.includes('service') || txt.includes('services')) score -= 2;
   if (txt.includes('for smb') || txt.includes('enterprise')) score -= 1;
+  if (/(use case|usecase|案例|场景|workflow|automation)/.test(txt)) score += 1;
 
   if (historyMap.normalizedTitles.has(item.normalizedTitle)) score -= 4;
   if (item.detailText) score += 1;
@@ -497,7 +503,7 @@ function pickDiverseSelected(items, limit) {
 `;
   md += `*生成时间：${nowCn} (Asia/Shanghai)*
 `;
-  md += `*默认自动模式：有 Tavily key 会自动增强；没有也可以直接用。*
+  md += `*默认使用 Bocha Search API。*
 `;
   fs.writeFileSync(outFile, md, 'utf8');
 })().catch((err) => { console.error(err); process.exit(1); });

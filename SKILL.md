@@ -1,6 +1,6 @@
 ---
 name: topic-monitor
-description: Use when a reusable topic-monitoring capability needs one stable entrypoint, optional Tavily support, China-search fallback, and a structured markdown report for repeated external-information scanning.
+description: Use when a reusable topic-monitoring capability needs one stable entrypoint, Bocha Search API retrieval, and a structured markdown report for repeated external-information scanning.
 ---
 
 # topic-monitor
@@ -11,8 +11,8 @@ topic-monitor 是一个可复用的主题监控能力包。
 它把围绕固定主题的外部信息扫描，压成一份结构化 markdown 日报。
 
 这版的关键变化是：
-- **Tavily 变成可选项，不再是硬依赖**
-- 默认支持 **有 key 走融合、没 key 自动退回 China 搜索**
+- 搜索层统一切到 **Bocha Search API**
+- 不再走 Tavily / China 混合路由
 
 核心约束仍然是：
 - 一个稳定主入口
@@ -26,7 +26,7 @@ topic-monitor 是一个可复用的主题监控能力包。
 - 需要按配置文件调整关键词、来源和筛选口径
 - 需要把结果稳定写成日报，而不是停留在终端输出
 - 需要一个可安装、可验证、可复用的能力包，而不是一次性脚本
-- 需要在 **无 Tavily key** 时仍能继续获得可用结果
+- 需要接入 **Bocha Search API** 做稳定检索
 
 不适合：
 - 一次性的临时搜索
@@ -37,8 +37,7 @@ topic-monitor 是一个可复用的主题监控能力包。
 
 - 主入口：`scripts/topic-monitor-run.sh`
 - 初始化：`scripts/install.sh`
-- 国内搜索层：`scripts/search.py`
-- 自动路由层：`scripts/search_router.py`
+- Bocha 搜索层：`scripts/search_bocha.py`
 - 日报渲染：`scripts/topic-monitor-render.js`
 - 配置样例：`config/topic-monitor-config.example.json`
 - 运行配置：`config/topic-monitor-config.json`
@@ -46,13 +45,16 @@ topic-monitor 是一个可复用的主题监控能力包。
 
 ## Search Behavior
 
-读者侧默认只需要使用**自动模式**。
+读者侧默认使用 **Bocha 单引擎模式**。
 
-系统会自动处理：
-- 有 `TAVILY_API_KEY` → 自动增强
-- 没有 `TAVILY_API_KEY` → 自动退回保底搜索
+必须提供：
+- `BOCHA_API_KEY`
 
-`provider / route / mode` 这些配置保留给开发和调试使用，不建议作为读者主口径。
+关键配置项：
+- `search.provider`（固定为 `bocha`）
+- `search.endpoint`
+- `search.freshness`
+- `search.summary`
 
 ## Verification
 
@@ -66,10 +68,10 @@ TODAY=$(TZ=Asia/Shanghai date +%Y-%m-%d)
 [ -s "./output/${TODAY}-主题监控日报.md" ] && echo "输出有内容 ✅" || echo "输出为空 ❌"
 ```
 
-如果你额外注入：
+运行前先注入：
 
 ```bash
-export TAVILY_API_KEY='你的 Tavily API Key'
+export BOCHA_API_KEY='你的 Bocha API Key'
 ```
 
-则会自动启用融合搜索。
+然后执行运行命令即可。

@@ -27,4 +27,4 @@
 
 ---
 *生成时间：2026-03-18 09:00:44 (Asia/Shanghai)*
-*默认自动模式：有 Tavily key 会自动增强；没有也可以直接用。*
+*默认使用 Bocha Search API。*

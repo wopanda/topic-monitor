@@ -38,6 +38,9 @@ EXCLUDE_JSON=$(jq -c '.filters.excludeKeywords // []' "$CONFIG_FILE")
 PREFERRED_DOMAINS_JSON=$(jq -c '.topics[0].preferredDomains // []' "$CONFIG_FILE")
 BLOCKED_DOMAINS_JSON=$(jq -c '.topics[0].blockedDomains // []' "$CONFIG_FILE")
 TOPIC_PROFILE_JSON=$(jq -c '.topics[0].profile // {}' "$CONFIG_FILE")
+DELIVERY_CHANNEL=$(jq -r '.delivery.channel // "feishu"' "$CONFIG_FILE")
+DELIVERY_TARGET=$(jq -r '.delivery.target // ""' "$CONFIG_FILE")
+ASK_AFTER_MANUAL_RUN=$(jq -r '.delivery.askAfterManualRun // true' "$CONFIG_FILE")
 SEARCH_PROVIDER=$(jq -r '.search.provider // "bocha"' "$CONFIG_FILE")
 SEARCH_FRESHNESS=$(jq -r '.search.freshness // "oneYear"' "$CONFIG_FILE")
 SEARCH_SUMMARY=$(jq -r '.search.summary // true' "$CONFIG_FILE")
@@ -146,3 +149,15 @@ node "$REPO_DIR/scripts/topic-monitor-render.js" \
 
 echo "报告已生成: $OUT_FILE"
 cat "$OUT_FILE"
+
+if [ "$ASK_AFTER_MANUAL_RUN" = "true" ] && [ "${TOPIC_MONITOR_CRON_RUN:-}" != "1" ]; then
+  echo
+  echo "---"
+  echo "要不要顺手设置定时发布？"
+  if [ -n "$DELIVERY_TARGET" ]; then
+    echo "可直接执行：bash scripts/create-openclaw-cron.sh --to $DELIVERY_TARGET --channel $DELIVERY_CHANNEL --create"
+  else
+    echo "可先预览命令：bash scripts/create-openclaw-cron.sh --to user:ou_xxx --channel $DELIVERY_CHANNEL"
+    echo "确认后再创建：bash scripts/create-openclaw-cron.sh --to user:ou_xxx --channel $DELIVERY_CHANNEL --create"
+  fi
+fi

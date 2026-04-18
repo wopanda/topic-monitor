@@ -11,12 +11,15 @@ mkdir -p "$TMP/output"
 [ -f "$ROOT/requirements.txt" ]
 [ -f "$ROOT/scripts/search_bocha.py" ]
 [ -f "$ROOT/scripts/topic-monitor-render.js" ]
+[ -f "$ROOT/scripts/create-openclaw-cron.sh" ]
 [ -f "$ROOT/config/topic-monitor-config.example.json" ]
 [ -f "$ROOT/examples/sample-report.md" ]
 
 bash "$ROOT/scripts/install.sh" >/dev/null
 python3 -m py_compile "$ROOT/scripts/search_bocha.py"
 node --check "$ROOT/scripts/topic-monitor-render.js" >/dev/null
+bash -n "$ROOT/scripts/create-openclaw-cron.sh" >/dev/null
+bash "$ROOT/scripts/create-openclaw-cron.sh" --to user:ou_demo >/dev/null
 
 cp "$ROOT/config/topic-monitor-config.example.json" "$TMP/topic-monitor-config.json"
 TODAY=$(TZ=Asia/Shanghai date +%Y-%m-%d)

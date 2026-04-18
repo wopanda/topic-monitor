@@ -81,11 +81,13 @@
     "similarityThreshold": 0.8
   },
   "delivery": {
-    "channel": "wecom",
+    "channel": "feishu",
+    "target": "",
+    "method": "openclaw-cron",
+    "askAfterManualRun": true,
     "format": "markdown",
     "includeEmoji": true,
-    "mode": "external_scheduler",
-    "description": "推荐使用外层调度器 / workflow / agent 负责定时触发与消息发送"
+    "description": "手动跑通后先问用户要不要开定时；确认后再用 OpenClaw cron 创建投递任务"
   },
   "filters": {
     "minQuality": 3,

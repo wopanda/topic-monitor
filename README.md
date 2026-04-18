@@ -128,6 +128,61 @@ export BOCHA_API_KEY='你的 Bocha API Key'
 
 ---
 
+## 手动看过一次后，默认下一步是什么
+
+这版现在按更稳的产品方式处理：
+
+- **先手动生成一次日报**
+- 用户看完以后，**再问要不要设置定时发布**
+- 只有用户明确同意后，才创建定时任务
+
+也就是说：
+- 不会默认偷偷开启每天自动发
+- 也不会要求日报脚本内部自己硬调发送工具
+
+更推荐的分层是：
+1. `topic-monitor` 负责生成日报
+2. `OpenClaw cron` 负责定时触发与投递
+
+---
+
+## 定时发布怎么做
+
+参考现有成功案例，当前建议的方式是：
+
+- 使用 **OpenClaw cron**
+- 不用系统 `crontab`
+- 不让 skill 内部自己承担调度器职责
+
+当前仓库已经带了辅助脚本：
+
+```bash
+bash scripts/create-openclaw-cron.sh --to user:ou_xxx
+```
+
+它默认会：
+- 读取 `config/topic-monitor-config.json`
+- 使用 `schedule.time` + `schedule.timezone`
+- 生成推荐的 `openclaw cron add` 命令
+
+真正创建时，加上 `--create`：
+
+```bash
+bash scripts/create-openclaw-cron.sh --to user:ou_xxx --create
+```
+
+如果要发到群聊，可改成：
+
+```bash
+bash scripts/create-openclaw-cron.sh --to chat:oc_xxx --create
+```
+
+默认目标格式：
+- 私聊：`user:ou_xxx`
+- 群聊：`chat:oc_xxx`
+
+---
+
 ## 跑出来大概长什么样
 
 默认输出会接近这样：
@@ -190,6 +245,11 @@ grep -n "今天最值得看\|今天看到的变化\|还可以顺手看看" "./ou
 - `topics[0].blockedDomains`：明确不想看的站点
 - `output.finalItems`：主列表条数
 - `output.watchItems`：补充列表条数
+- `schedule.time`：默认定时发布时间
+- `schedule.timezone`：默认时区
+- `delivery.channel`：默认投递渠道
+- `delivery.target`：默认投递目标（可留空，创建 cron 时再传）
+- `delivery.askAfterManualRun`：手动跑完后是否默认追问用户要不要开定时
 
 如果只是第一次上手，可以先不用动这些。
 
@@ -239,6 +299,18 @@ pip3 install -r requirements.txt
 
 但这两个字段应理解为：
 **给定时发布层使用的默认配置**，不是 skill 本体会自己等到点后自动发送。
+
+如果你确认要开定时发布，可以先预览命令：
+
+```bash
+bash scripts/create-openclaw-cron.sh --to user:ou_xxx
+```
+
+确认无误后再真正创建：
+
+```bash
+bash scripts/create-openclaw-cron.sh --to user:ou_xxx --create
+```
 
 更完整说明见：
 

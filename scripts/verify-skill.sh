@@ -14,6 +14,7 @@ mkdir -p "$TMP/output"
 [ -f "$ROOT/scripts/create-openclaw-cron.sh" ]
 [ -f "$ROOT/config/topic-monitor-config.example.json" ]
 [ -f "$ROOT/examples/sample-report.md" ]
+[ -f "$ROOT/references/natural-interaction.md" ]
 
 bash "$ROOT/scripts/install.sh" >/dev/null
 python3 -m py_compile "$ROOT/scripts/search_bocha.py"

@@ -21,6 +21,7 @@ cp "$ROOT/config/topic-monitor-config.example.json" "$TMP/config/topic-monitor-c
 cp "$ROOT/config/字段说明.md" "$TMP/config/字段说明.md"
 cp "$ROOT/examples/sample-report.md" "$TMP/examples/sample-report.md"
 cp "$ROOT/references/scheduled-delivery.md" "$TMP/references/scheduled-delivery.md"
+cp "$ROOT/references/natural-interaction.md" "$TMP/references/natural-interaction.md"
 cp "$ROOT/output/.gitkeep" "$TMP/output/.gitkeep"
 
 PYTHONPATH="/root/.openclaw/skills/skill-creator" python3 "$PACKAGE_SCRIPT" "$TMP" "$OUT_DIR"
